@@ -1,21 +1,19 @@
 import React from "react";
 import styled from 'styled-components'
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useRouteMatch,
-  useParams
-} from "react-router-dom";
 
 import Page from "./Components/Page"
 import Navigator from "./Components/Navigator";
 import {H1, H2, H3, H4} from "./Components/Typography";
 import ThumbnailsList from "./Components/ThumbnailsList"
 
+//profile badge
+const Profile = styled.div`
+  width: 50%;
+  margin: 0 auto;
+  display: block;
+`
 
-//homepage
+//profile page
 export default class App extends React.Component {
   constructor(props) {
     super(props);
@@ -47,8 +45,12 @@ export default class App extends React.Component {
   render(){
     return (
       <Page>
-        <Navigator />
-        <ThumbnailsList urls={this.state.pictureURLs}/>
+          <Navigator />
+          <Profile>
+            <H1>@abc1234</H1>
+            <H4>nickname's profile.</H4>
+          </Profile>
+          <ThumbnailsList urls={this.state.pictureURLs}/>
       </Page>        
     )
   }

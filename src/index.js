@@ -1,13 +1,45 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
+
 import reportWebVitals from './reportWebVitals';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useRouteMatch,
+  useParams
+} from "react-router-dom";
+
+// pages
+import App from './App';
+import Post from './Post';
+import Profile from './Profile';
+import Login from './Login';
+import Submit from './Submit';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <Router>
+    <Switch>
+      <Route path="/profile">
+        <Profile />
+      </Route>
+      <Route path="/post">
+        <Post />
+      </Route>
+      <Route path="/login">
+        <Login />
+      </Route>
+      <Route path="/submit">
+        <Submit />
+      </Route>
+      <Route path="/">
+        <App />
+      </Route>
+      <App />
+    </Switch>
+  </Router>,
   document.getElementById('root')
 );
 
