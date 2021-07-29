@@ -21,5 +21,7 @@ export const Big = styled(Logo)`
 export const Small = styled(Logo)`
   font-size: 14px;
   padding: 2px;
+  margin: 0;
+  margin-bottom: 1em;
   border-bottom: 2px solid #d45d79;
 `

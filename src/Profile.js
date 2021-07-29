@@ -1,57 +1,72 @@
 import React from "react";
 import styled from 'styled-components'
+import { withRouter } from "react-router";
 
 import Page from "./Components/Page"
 import Navigator from "./Components/Navigator";
 import {H1, H2, H3, H4} from "./Components/Typography";
 import ThumbnailsList from "./Components/ThumbnailsList"
 
+import ajax from "./lib/ajax";
+
 //profile badge
-const Profile = styled.div`
+const ProfileBadge = styled.div`
   width: 50%;
   margin: 0 auto;
   display: block;
 `
 
 //profile page
-export default class App extends React.Component {
+class Profile extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      username: "",
+      createAt: "",
       pictureURLs: []
     }    
   }
 
-  componentDidMount() {
-    /* for debug usage: randomize generate pic from Lorem PicSUM */
-
-    var mockPictures = []; 
-    for (var i = 0; i < 32; i++){
-      var id = Math.floor(Math.random() * 1000)+1;
-      var width = Math.floor(Math.random() * 1280)+640;
-      var username = Math.floor(Math.random() * 99999999)+10000000;
-      mockPictures.push({
-        "id": i,
-        "username": "@" + username, 
-        url: `https://picsum.photos/id/${id}/${width}`
-      });
+  async componentDidMount() {    
+    let id = this.props.match.params.id, post_url = `/api/posts/${id}`, profile_url =`/api/user/${id}`;
+    if (id === undefined){
+      post_url = `/api/posts/`;
+      profile_url = `/api/user/`;
     }
 
-    this.setState({
-      pictureURLs: this.state.pictureURLs.concat(mockPictures)
-    });
+    
+    var mockPictures = []; 
+    var people = await ajax.generic(profile_url, "GET", null, true);    
+    if (people.payload === null) {
+      this.setState({
+        username: "User not found.",
+        createdAt: "",
+        pictureURLs: []
+      });
+    }
+    else{
+      var result = await ajax.generic(post_url, "GET", null, true);
+      mockPictures = result.payload;
+      this.setState({
+        username: "@" + people.payload.username,
+        createdAt: "Joined at " + people.payload.createdAt,
+        pictureURLs: this.state.pictureURLs.concat(mockPictures)
+      });
+    }
   }
 
   render(){
     return (
       <Page>
           <Navigator />
-          <Profile>
-            <H1>@abc1234</H1>
-            <H4>nickname's profile.</H4>
-          </Profile>
-          <ThumbnailsList urls={this.state.pictureURLs}/>
+          <ProfileBadge>
+            <H1>{this.state.username}</H1>
+            <H4>{this.state.createdAt}</H4>
+          </ProfileBadge>
+          <ThumbnailsList images={this.state.pictureURLs}/>
       </Page>        
     )
   }
 }
+
+export default withRouter(Profile);

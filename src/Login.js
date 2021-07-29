@@ -8,12 +8,16 @@ import {
   useRouteMatch,
   useParams
 } from "react-router-dom";
+import Cookies from 'universal-cookie';
 
-import Page from "./Components/Page"
+import Page from "./Components/Page";
 import {H1, H2, H3, H4} from "./Components/Typography";
 import * as Logo from "./Components/Logo"
-import * as FormElement from "./Components/Form"
-import Button from "./Components/Button"
+import * as FormElement from "./Components/Form";
+import Button from "./Components/Button";
+import ErrorMessage from "./Components/ErrorMessage";
+import ajax from "./lib/ajax";
+import config from './lib/config';
 
 const CenteredPage = styled(Page)`
     display: flex; 
@@ -39,15 +43,25 @@ const Form = styled.form`
 export default class App extends React.Component {
   constructor(props) {
     super(props);
+    this.cookies = new Cookies();
     this.state = {
       username: "",
       password: "",
       errorMsg: "",
       usernameIsValid: true,
-      passwordIsValid: true
+      passwordIsValid: true  
     }
+    this.checkFormValidBeforeSubmit = this.checkFormValidBeforeSubmit.bind(this); //decorator
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleSignUp = this.handleSignUp.bind(this);
+    this.handleSignOn = this.handleSignOn.bind(this);
+  }
+
+  checkFormValidBeforeSubmit() {
+     return this.state.usernameIsValid && 
+       this.state.passwordIsValid &&
+       this.state.username !== "" &&
+       this.state.password !== "";
   }
 
   handleChange(event) {    
@@ -66,24 +80,42 @@ export default class App extends React.Component {
       });
   }
 
-  handleSubmit(event) {
-    alert('A name was submitted: ' + this.state.username + "/" + this.state.password);
+  async handleSignOn(event) {
     event.preventDefault();
+    if (!this.checkFormValidBeforeSubmit()) return;
+    
+    const result = await ajax.generic(`/api/signon`, "POST", {username: this.state.username, password: this.state.password});
+    if (result.code === "0") {
+      this.cookies.set("token", result.payload, config.cookieExpireIn);
+      window.location.href = '/'; //relative to domain
+    }else{
+      this.setState({
+        "passwordIsValid": false,
+        "errorMsg": `[${result.code}] ${result.message}`
+      });
+    }
   }
+
+  async handleSignUp(event) {
+    event.preventDefault();   
+    if (!this.checkFormValidBeforeSubmit()) return;
+    
+    var result = await ajax.generic(`/api/signup`, "POST", {username: this.state.username, password: this.state.password});
+    console.log(result);
+  }  
 
   render() {
       return (
         <CenteredPage>
-          <Form>
+          <Form method="post">
             <Logo.Small to="/">InstaPic</Logo.Small>
             <H1>Hello.</H1>
             <FormElement.Input type="text" name="username" value={this.state.username} error={!this.state.usernameIsValid} onChange={this.handleChange} placeholder="Username"/>
             <FormElement.Input type="password" name="password" value={this.state.password} error={!this.state.passwordIsValid} onChange={this.handleChange} placeholder="Password (at least 6 character)"/>
-            <p style={{"font-size": "11px", "text-align": "center", "color": "red", "padding" : 0}}>
-                {this.state.errorMsg.length > 0? this.state.errorMsg : '\u00A0'}</p>
-            <Button>Sign Up</Button>
+            <ErrorMessage message={this.state.errorMessage} />
+            <Button onClick={this.handleSignOn}>Sign On</Button>
             <p style={{"font-size": "11px", "text-align": "center", "padding" : 0}}>Already has an account? or ...</p>
-            <Button>Sign On</Button>
+            <Button onClick={this.handleSignUp}>Sign Up</Button>
           </Form>
         </CenteredPage>
       )

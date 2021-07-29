@@ -6,12 +6,16 @@ import {
 import * as Logo from "./Logo"
 
 const NavWrapper = styled.div`
-  width: 90%;
+  width: 100%;
   min-width: 500px;
   height: 2em;
-  margin: 0 auto;
   margin-bottom: 4em;
   margin-top: 1em;
+  > div {
+    width: 90%;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
 `
 
 const NavLink = styled(Link)`
@@ -34,9 +38,11 @@ const NavLink = styled(Link)`
 export default function Navigator() {
   return (
     <NavWrapper>
-      <Logo.Big to="/">InstaPic</Logo.Big>
-      <NavLink to="/profile">Your Page</NavLink>
-      <NavLink to="/login">Sign On/Up</NavLink>
+      <div>
+        <Logo.Big to="/">InstaPic</Logo.Big>
+        <NavLink to="/profile">Your Page</NavLink>
+        <NavLink to="/submit">Submit Post</NavLink>        
+      </div>      
     </NavWrapper>
   );
 }

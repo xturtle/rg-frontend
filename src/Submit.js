@@ -1,50 +1,20 @@
 import React from "react";
 import styled from 'styled-components';
-import ImageUploader from 'react-image-uploader';
 
 import Page from "./Components/Page";
 import Navigator from "./Components/Navigator";
 import {H1, H2, H3, H4} from "./Components/Typography";
 import Button from "./Components/Button";
 import {Textarea} from "./Components/Form";
+import ImageUpload from "./Components/ImageUpload";
+import ErrorMessage from "./Components/ErrorMessage";
+import ajax from "./lib/ajax";
 
 const PostWrapper =styled.div`
   width: 90%;
   margin: 0 auto;
   overflow-y: auto;
   display: table;
-`
-
-const PostImageUploadWrapper = styled.div`
-  width: 60%;
-  height: 100%;
-  float: left;
-  border-radius: 10px;
-  display: table-cell;
-
-  /* the following workaround is to enforce to override the style settings of package "ImageUpload" */
-  > div > div {
-    display: block !important;
-  }
-  > div > div > div {
-      width: 100% !important;     
-      height: 100% !important;
-      display: flex;
-      border: 1px solid #333 !important;      
-      border-radius: 10px !important;
-      justify-content: center;
-      align-items: stretch;     
-      &:before {      /* enforce to stretch vertically to 100% */
-        content: '';
-        display: table;
-        padding-top: 100%;
-      }; 
-      padding: 1em;
-  }
-  > div > div > div > button {
-    ${Button.componentStyle.rules[0]};
-    height: 5em;
-  }
 `
 
 const PostText = styled.div`
@@ -61,43 +31,72 @@ const PostText = styled.div`
 export default class Post extends React.Component {
   constructor(props) {
     super(props);
-    console.log()
     this.state = {
-      userid: 1,
-      username: "12345678",
-      image: "https://picsum.photos/id/608/769",
-      text: ""
-    }    
+      username: "",
+      image: null,
+      text: "",
+      errorMsg: null
+    }
+    this.form = React.createRef();
+    this.handleFileChange = this.handleFileChange.bind(this);
+    this.handleTextChange = this.handleTextChange.bind(this);
+    this.handlePostSubmit = this.handlePostSubmit.bind(this);
   }
   
-  componentDidMount() {
+  async componentDidMount() {
+    var result = await ajax.generic(`/api/user`, "GET", null, true);
+    this.setState({
+      username: result.payload.username
+    });
+  } 
+
+  handleFileChange(event) {
+    this.setState({
+      image: event.target.value
+    });
   }
 
+  handleTextChange(event) {
+    this.setState({
+     text: event.target.value
+    });
+  }
   
-  
+  async handlePostSubmit(event){
+    event.preventDefault();
+    const data = new FormData(this.form.current)
+    console.log(data);
+    if (this.state.image === null){
+      this.setState({
+        errorMsg: "No image assigned"
+       });
+       return;
+    }
+    var result = await ajax.multipart(`/api/post`, data, true);
+    if (result.code === "0")
+      window.location.href = `/post/${result.payload}`; //relative to domain
+    else {
+      this.setState({
+        errorMsg: `[${result.code}] ${result.message}`
+      })
+    }
+  }
+
   render(){
     return (
       <Page>
         <Navigator />
-        <PostWrapper> 
-          <PostImageUploadWrapper>
-            <ImageUploader
-	          url="http://localhost:9090/notmultiple"
-		      optimisticPreviews
-		      multiple={false}
-		      onLoadEnd={(err) => {
-		        if (err) {
-		          console.error(err);
-			    }
-		      }}
-		      label="Upload a picture"
-		    />
-          </PostImageUploadWrapper>          
-          <PostText>
-            <H2>@{this.state.username}</H2>
-            <H4>Submit a new post</H4>
-            <Textarea placeholder="Write something...">{this.state.text}</Textarea>
-          </PostText>
+        <PostWrapper>
+          <form onSubmit={this.handlePostSubmit} ref={this.form}>
+            <ImageUpload name="image" onChange={this.handleFileChange}/>
+            <PostText>
+              <H2>@{this.state.username}</H2>
+              <H4>Submit a new post</H4>
+              <Textarea name="text" placeholder="Write something..." onChange={this.handleTextChange}>{this.state.text}</Textarea>
+              <ErrorMessage message={this.state.errorMsg} />
+              <Button style={{"float" : "right"}}>Submit</Button>
+            </PostText>
+          </form>
         </PostWrapper>        
       </Page>        
     )

@@ -22,10 +22,10 @@ import Submit from './Submit';
 ReactDOM.render(
   <Router>
     <Switch>
-      <Route path="/profile">
+      <Route path="/profile/:id?">
         <Profile />
       </Route>
-      <Route path="/post">
+      <Route path="/post/:id">
         <Post />
       </Route>
       <Route path="/login">

@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import {
     Link
 } from "react-router-dom";
+import config from "../lib/config"
 
 const ThumbnailBox = styled.div`    
   display: flex;
@@ -33,7 +34,7 @@ const ThumbnailBody = styled(Link)`
     opacity : 1;
   }
 
-  ${props => props.url ? "background: url(" + props.url + ") no-repeat center center;" : "background-color: gray"};    
+  ${props => props.url ? `background: url('${config.imagePath}/${props.url}') no-repeat center center;` : "background-color: gray"};    
 `
 
 export default function Thumbnail (props){

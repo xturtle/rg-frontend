@@ -1,17 +1,17 @@
 html, body{
-    height: 100%;
-  }
+  height: 100%;
+}
   
-  body {
-    margin: 0;
-    padding: 0;
-    background-color: #e9e2d0;  
-  }
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #e9e2d0;
+}
   
-  body > #root {
-    height: 100vh;
-  }
+body > #root {
+  height: 100vh;
+}
   
-  *, *.visited {
-    color: #333;
-  }
+*, *.visited {
+  color: #333;
+}
