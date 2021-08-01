@@ -21,7 +21,7 @@ export default class Auth extends React.Component {
 const cookies = new Cookies();
 const token = cookies.get('token');
 
-if (token === undefined || token === null) {
+if ((token === undefined || token === null) && (window.location.pathname.split("/").pop() !=="login")) {
   window.location.href = '/login'; //relative to domain
 }
 

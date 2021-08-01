@@ -37,6 +37,8 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "cross-env": "^7.0.3"
+  },
   "proxy": "http://localhost:3001"
 }
