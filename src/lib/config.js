@@ -1,6 +1,6 @@
 const config = {
   "dev":{
-    "url": "http://localhost:3001",
+    "url": "/api/",
     "cookieExpireIn": 60,
     "imagePath": "/images/"
   },
@@ -8,9 +8,10 @@ const config = {
 
   },
   "production": {
-    url:"/api/", 
-    "cookieExpireIn": 86400
+    "url": "/api/",
+    "cookieExpireIn": 86400,
+    "imagePath": "/images/"
   }
 };
 
-export default config.dev;
+export default config[process.env.NODE_ENV];
