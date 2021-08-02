@@ -1,6 +1,9 @@
 import React from "react";
 import styled from 'styled-components'
 import { withRouter } from "react-router";
+import {
+  Link
+} from "react-router-dom";
 
 import Page from "./Components/Page"
 import Navigator from "./Components/Navigator";
@@ -63,7 +66,7 @@ class Post extends React.Component {
         <PostWrapper> 
           <PostImage src={this.state.image}/>
           <PostText>
-            <H2>@{this.state.username}</H2>
+            <H2>@<Link to={{pathname: `/profile/${this.state.uid}`}}>{this.state.username}</Link></H2>
             <H4>posted at {this.state.createdAt}</H4>
             <p>{this.state.text}</p>
           </PostText>

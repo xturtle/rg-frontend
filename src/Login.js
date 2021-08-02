@@ -47,7 +47,7 @@ export default class App extends React.Component {
     this.state = {
       username: "",
       password: "",
-      errorMsg: "",
+      errorMessage: "",
       usernameIsValid: true,
       passwordIsValid: true  
     }
@@ -71,12 +71,12 @@ export default class App extends React.Component {
     if (event.target.name === "password" && event.target.value.length < 6)
       this.setState({
         "passwordIsValid": false,
-        "errorMsg": "Password is too short"
+        "errorMessage": "Password is too short"
       });
     else
       this.setState({
         "passwordIsValid": true,
-        "errorMsg": ""
+        "errorMessage": ""
       });
   }
 
@@ -91,7 +91,7 @@ export default class App extends React.Component {
     }else{
       this.setState({
         "passwordIsValid": false,
-        "errorMsg": `[${result.code}] ${result.message}`
+        "errorMessage": `[${result.code}] ${result.message}`
       });
     }
   }
@@ -100,8 +100,20 @@ export default class App extends React.Component {
     event.preventDefault();   
     if (!this.checkFormValidBeforeSubmit()) return;
     
-    var result = await ajax.generic(`/api/signup`, "POST", {username: this.state.username, password: this.state.password});
-    console.log(result);
+    const result = await ajax.generic(`/api/signup`, "POST", {username: this.state.username, password: this.state.password});
+    if (result.code === "0") {
+      alert("Successfully signed up.");
+      const login_result = await ajax.generic(`/api/signon`, "POST", {username: this.state.username, password: this.state.password});
+      if (login_result.code === "0") {
+        this.cookies.set("token", login_result.payload, config.cookieExpireIn);
+        window.location.href = '/'; //relative to domain
+      }
+    } else {
+      this.setState({
+        "passwordIsValid": false,
+        "errorMessage": `[${result.code}] ${result.message}`
+      });
+    }
   }  
 
   render() {

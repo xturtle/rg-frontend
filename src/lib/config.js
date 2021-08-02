@@ -1,5 +1,5 @@
 const config = {
-  "dev":{
+  "development":{
     "url": "/api/",
     "cookieExpireIn": 60,
     "imagePath": "/images/"

@@ -29,11 +29,9 @@ class Profile extends React.Component {
 
   async componentDidMount() {    
     let id = this.props.match.params.id, post_url = `/api/posts/${id}`, profile_url =`/api/user/${id}`;
-    if (id === undefined){
-      post_url = `/api/posts/`;
+    if (id === undefined)
       profile_url = `/api/user/`;
-    }
-
+    
     
     var mockPictures = []; 
     var people = await ajax.generic(profile_url, "GET", null, true);    
@@ -45,7 +43,7 @@ class Profile extends React.Component {
       });
     }
     else{
-      var result = await ajax.generic(post_url, "GET", null, true);
+      var result = await ajax.generic(`${post_url}`, "GET", null, true);
       mockPictures = result.payload;
       this.setState({
         username: "@" + people.payload.username,
