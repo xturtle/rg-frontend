@@ -1,70 +1,200 @@
-# Getting Started with Create React App
+# HOMEWORK
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+if your OS is windows please read this link to solve soft link problem: http://stackoverflow.com/a/16754068
 
-## Available Scripts
+## deployment usage:
 
-In the project directory, you can run:
+```SHELL==
+$ git clone https://github.com/xturtle/rg-backend.git
+$ git clone https://github.com/xturtle/rg-frontend.git
+$ cd rg-backend
+$ sudo ./deploy.sh
 
-### `npm start`
+# root permission required for autobind package, allow your linux account using 80 port
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## test usage:
+```SHELL==
+# after git clone
+$ npm run test
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+# API
 
-### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## user related funciton
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### sign on [POST] [JSON]
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+proceed to login.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```SHELL==
+/api/signon
+{
+  "username":"jon_dowd",        //string
+  "password":"12345"            //string
+}
+```
 
-### `npm run eject`
+result:
+```SHELL==
+{
+  "code": "0",
+  "message": "No Problem",
+  "payload": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywidXNlcm5hbWUiOiJhbGljZSIsImlhdCI6MTYyNzg4OTI2NCwiZXhwIjoxNjI3OTc1NjY0fQ.kcTUQJodc8oKLItHzd7mAVfUc6H11ygyUXn86z4_E3s" //JWT Token
+}
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+possible errors:
+code 100: Wrong username or password
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### sign up [POST] [JSON]
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+proceed to register new user.
 
-## Learn More
+```SHELL==
+/api/signup
+{
+  "username":"jon_dowd",	//string
+  "password":"12345"		//string, must length > 6
+}
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+result:
+```SHELL==
+{
+  "code": "0",
+  "message": "No Problem",
+  "payload": null		
+}
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+possible errors:
+code 110: Bad password: at least six characters required
+code 111: This username is already in use.
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## post related function
 
-### Analyzing the Bundle Size
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### get posts [GET] [AuthRequired]
 
-### Making a Progressive Web App
+get posts of all or specified users' posts.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```SHELL==
+/api/posts/:peopleID?/:offset?/:size?/?recently={true|false}
 
-### Advanced Configuration
+peopleID: string, use "all" to get all posts.
+offset: int, load post from #offset.
+size: int, load count of posts.
+recently: boolean, load post sort bt time, true=DESC, false=ASC (default is true)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+mark as '?' means optional param.
+```
 
-### Deployment
+result:
+```SHELL==
+{
+  "code": "0",
+  "message": "No problem",
+  "payload": [
+    {
+      "id": 1,						//post id
+      "uid": 1,						//poster
+      "image": "04948030a3d4912a1020e7cb35c768aa.jpg",	//image url
+      "text": "Lorem Ipsum ...",			//description
+      "createdAt": "2021-08-01T16:29:46.929Z",		//create time
+      "updatedAt": "2021-08-01T16:29:46.929Z"		//update time
+    },
+    ...
+  ]
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+possible errors:
+None.
+if criteria too strict to found any posts, [] empty payload will get.
 
-### `npm run build` fails to minify
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### get a post [GET] [AuthRequired]
+
+get a post.
+
+```SHELL==
+/api/post/:postID
+
+postID: int, post id.
+```
+
+result:
+```SHELL==
+{
+  "code": "0",
+  "message": "No problem",
+  "payload": {
+    "id": 2,						//post id
+    "uid": 2,						//poster id
+    "image": "04948030a3d4912a1020e7cb35c768aa.jpg",	//image url
+    "text": "Lorem Ipsum...",				//description
+    "createdAt": "2021-08-01T16:29:46.929Z",		//create time
+    "updatedAt": "2021-08-01T16:29:46.929Z"		//update time
+  }
+}
+```
+
+possible errors:
+None.
+if post id not found, payload will be null.
+
+
+### get a user [GET] [AuthRequired]
+
+get a user profile.
+
+```SHELL==
+/api/user/:peopleID?
+
+peopleID: string, if not specified, will get current logged in user's profile.
+```
+
+result:
+```SHELL==
+{
+  "code": "0",
+  "message": "No problem",
+  "payload": {
+    "id": 2,					//user id
+    "username": "kathy",			//user name
+    "createdAt": "2021-08-01T16:29:26.085Z",	//create time
+    "updatedAt": "2021-08-01T16:29:26.085Z"	//update time
+  }
+}
+```
+
+possible errors:
+code 120: User not found.
+
+
+### submit new post [POST] [x-www-form-urlencoded] [AuthRequired]
+
+submitting new post.
+
+```SHELL==
+/api/post
+image: the image file url (local)
+text: the description of image
+```
+
+result:
+```SHELL==
+{
+  "code": "0",
+  "message": "No problem",
+  "payload": postID		//int, the postID of submitted post.
+}
+```
+
+possible errors:
+code 200: No image uploaded. 
